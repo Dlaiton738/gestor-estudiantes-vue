@@ -1,31 +1,82 @@
+
 const { createApp } = Vue;
 
 createApp({
-    data() {
-        return {
-            Nombre: "",
-            Edad:"",
-            Cruso:"",
-            Nota: "",
-            estudiantes:[]
-            
-        };
+  data() {
+    return {
+      Nombre: "",
+      Edad: "",
+      curso: "",
+      Nota: "",
+      estudiantes: [],
+      siguienteId: 1,
+    };
+  },
+
+  methods: {
+    comprobarFuncionamiento() {
+      alert("¡La aplicación está funcionando!");
     },
 
-    methods: {
-        comprobarFuncionamiento() {
-            alert("¡La aplicación está funcionando!");
-        },
+    agregarEstudiante() {
+      if (this.Nombre.trim() === "") {
+        alert("Por favor, ingrese un nombre de estudiante");
+        return;
+      }
 
-        agregarEstudiante(){
+      if (
+        this.Nota === "" ||
+        Number(this.Nota) < 0 ||
+        Number(this.Nota) > 10
+      ) {
+        alert("La calificación debe estar entre 0 y 10");
+        return;
+      }
 
-            if(this.Nombre.trim()=== ""){
-                alert("por favor, ingrese un nombre de estudiante");
-                return;
-            }
-            this.estudiantes.push(this.Nombre);
+      this.estudiantes.push({
+        id: this.siguienteId++,
+        nombre: this.Nombre.trim(),
+        edad: this.Edad,
+        carrera: this.curso.trim(),
+        calificacion: Number(this.Nota),
+      });
 
-            this.nombre = "";
-        }
-    }
+      this.Nombre = "";
+      this.Edad = "";
+      this.curso = "";
+      this.Nota = "";
+    },
+
+    estudiantesFiltrados() {
+      return this.estudiantes;
+    },
+
+    colorNota(nota) {
+      if (nota >= 6) {
+        return "verde";
+      } else if (nota >= 4) {
+        return "naranja";
+      } else {
+        return "rojo";
+      }
+    },
+
+    aumentarCalificacion(est) {
+      if (est.calificacion < 10) {
+        est.calificacion++;
+      }
+    },
+
+    disminuirCalificacion(est) {
+      if (est.calificacion > 0) {
+        est.calificacion--;
+      }
+    },
+
+    eliminarEstudiante(id) {
+      this.estudiantes = this.estudiantes.filter(
+        (est) => est.id !== id
+      );
+    },
+  },
 }).mount("#app");
