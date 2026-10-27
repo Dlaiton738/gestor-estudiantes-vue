@@ -14,13 +14,45 @@
     <div id="app">
         <h1>Gestor de estudiantes</h1>
         <p>Bienvenido al sistema de gestión de estudiantes.</p>
+        <form @submit.prevent="agregarEstudiante">
+            <fieldset>
+                <div>
+                    <label>nombre del estudiante: </label>
+                    <input v-model.trim="Nombre" type="text" placeholder="nombre completo">
+                </div>
 
-        <label>nombre del estudiante:</label>
-        <input v-model="nombre" type="text" placeholder="nombre completo">
-        <br>
+                <div>
+                    <label>Edad: </label>
+                    <input v-model="Edad" type="number" placeholder="Edad del estudiante">
+                </div>
+
+                <div>
+                    <label>curso: </label>
+                    <input v-model="curso" type="string" placeholder="curso en el que se encuetra">
+                </div>
+
+                <div>
+                    <label>Nota: </label>
+                    <input v-model="Nota" type="number" placeholder="Nota del estudiante">
+                </div><br>
+
+                <button type="submit">Registrar estudiante</button>
+            </fieldset>
+            
+        </form>
+
+        <h2>lista de estudiantes</h2>
+        
+        <ul>
+            <li v-for="estudiante in estudiantes">
+                {{estudiante}}
+            </li>
+        </ul>
+        <!-- <label>nombre escrito:{{nombre}}</label> -->
+        <!-- <br><br>
         <button @click="comprobarFuncionamiento">
             Probar Vue.js
-        </button>
+        </button> -->
     </div>
 
     <script src="app.js"></script>
