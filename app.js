@@ -1,4 +1,3 @@
-
 const { createApp } = Vue;
 
 createApp({
@@ -10,6 +9,10 @@ createApp({
       Nota: "",
       estudiantes: [],
       siguienteId: 1,
+
+      filtroCarrera: "Todas",
+      busqueda: "",
+      filtroEstado: "Todos",
     };
   },
 
@@ -24,11 +27,7 @@ createApp({
         return;
       }
 
-      if (
-        this.Nota === "" ||
-        Number(this.Nota) < 0 ||
-        Number(this.Nota) > 10
-      ) {
+      if (this.Nota === "" || Number(this.Nota) < 0 || Number(this.Nota) > 10) {
         alert("La calificación debe estar entre 0 y 10");
         return;
       }
@@ -48,7 +47,21 @@ createApp({
     },
 
     estudiantesFiltrados() {
-      return this.estudiantes;
+      return this.estudiantes.filter((est) => {
+        const coincideCarrera =
+          this.filtroCarrera === "Todas" || est.carrera === this.filtroCarrera;
+
+        const coincideNombre = est.nombre
+          .toLowerCase()
+          .includes(this.busqueda.toLowerCase());
+
+        const coincideEstado =
+          this.filtroEstado === "Todos" ||
+          (this.filtroEstado === "Aprobados" && est.calificacion >= 6) ||
+          (this.filtroEstado === "Reprobados" && est.calificacion < 6);
+
+        return coincideCarrera && coincideNombre && coincideEstado;
+      });
     },
 
     colorNota(nota) {
@@ -74,9 +87,7 @@ createApp({
     },
 
     eliminarEstudiante(id) {
-      this.estudiantes = this.estudiantes.filter(
-        (est) => est.id !== id
-      );
+      this.estudiantes = this.estudiantes.filter((est) => est.id !== id);
     },
   },
 }).mount("#app");
