@@ -17,23 +17,29 @@
         <form @submit.prevent="agregarEstudiante">
             <fieldset>
                 <div>
-                    <label>nombre del estudiante: </label>
-                    <input v-model.trim="Nombre" type="text" placeholder="nombre completo">
+                    <label>nombre: </label>
+                    <input v-model.trim="Nombre" type="text" id="nombre" placeholder="nombre completo">
+                    <p v-if="errorNombre()">{{errorNombre()}}</p>
                 </div>
 
-                <div>
-                    <label>Edad: </label>
-                    <input v-model="Edad" type="number" placeholder="Edad del estudiante">
-                </div>
+                <label for="carrera">Carrera:</label>
+
+                <select id="carrera" v-model="carrera">
+                    <option value="">Selecciona una carrera</option>
+
+                    <option v-for="opcion in carreras" :value="opcion">
+                        {{ opcion }}
+                    </option>
+                </select>
 
                 <div>
-                    <label>curso: </label>
-                    <input v-model="curso" type="string" placeholder="curso en el que se encuetra">
+                    <label>calificacion:</label>
+                    <input v-model.number="calificacion" type="number" id="calificacion" placeholder="calificacion">
                 </div>
 
+
                 <div>
-                    <label>Nota: </label>
-                    <input v-model="Nota" type="number" placeholder="Nota del estudiante">
+                   
                 </div><br>
 
                 <button type="submit">Registrar estudiante</button>
