@@ -1,60 +1,98 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de estudiantes</title>
 
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
-<body>
+  </head>
+
+  <body>
     <div id="app">
-        <h1>Gestor de estudiantes</h1>
-        <p>Bienvenido al sistema de gestión de estudiantes.</p>
-        <form @submit.prevent="agregarEstudiante">
-            <fieldset>
-                <div>
-                    <label>nombre del estudiante: </label>
-                    <input v-model.trim="Nombre" type="text" placeholder="nombre completo">
-                </div>
+      <h1>Gestor de estudiantes</h1>
+      <p>Bienvenido al sistema de gestión de estudiantes.</p>
 
-                <div>
-                    <label>Edad: </label>
-                    <input v-model="Edad" type="number" placeholder="Edad del estudiante">
-                </div>
+      <form @submit.prevent="agregarEstudiante">
+        <fieldset>
+          <div>
+            <label>Nombre del estudiante:</label>
+            <input
+              v-model.trim="Nombre"
+              type="text"
+              placeholder="Nombre completo"
+            />
+          </div>
 
-                <div>
-                    <label>curso: </label>
-                    <input v-model="curso" type="string" placeholder="curso en el que se encuetra">
-                </div>
+          <div>
+            <label>Edad:</label>
+            <input
+              v-model="Edad"
+              type="number"
+              placeholder="Edad del estudiante"
+            />
+          </div>
 
-                <div>
-                    <label>Nota: </label>
-                    <input v-model="Nota" type="number" placeholder="Nota del estudiante">
-                </div><br>
+          <div>
+            <label>Curso:</label>
+            <input
+              v-model="curso"
+              type="text"
+              placeholder="Curso del estudiante"
+            />
+          </div>
 
-                <button type="submit">Registrar estudiante</button>
-            </fieldset>
-            
-        </form>
+          <div>
+            <label>Nota:</label>
+            <input
+              v-model.number="Nota"
+              type="number"
+              placeholder="Nota del estudiante"
+            />
+          </div>
 
-        <h2>lista de estudiantes</h2>
-        
-        <ul>
-            <li v-for="estudiante in estudiantes">
-                {{estudiante}}
-            </li>
-        </ul>
-        <!-- <label>nombre escrito:{{nombre}}</label> -->
-        <!-- <br><br>
-        <button @click="comprobarFuncionamiento">
-            Probar Vue.js
-        </button> -->
+          <br />
+          <button type="submit">Registrar estudiante</button>
+        </fieldset>
+      </form>
+
+      <h2>Lista de estudiantes</h2>
+
+      <p v-if="estudiantes.length === 0">
+        No hay estudiantes registrados.
+      </p>
+
+      <ul>
+        <li v-for="est in estudiantesFiltrados()" :key="est.id">
+          {{ est.nombre }} - {{ est.carrera }} -
+
+          <span v-if="est.calificacion === 10">⭐</span>
+
+          <span :class="colorNota(est.calificacion)">
+            {{ est.calificacion }}
+          </span>
+
+          <button
+            @click="aumentarCalificacion(est)"
+            :disabled="est.calificacion === 10"
+          >
+            +1
+          </button>
+
+          <button
+            @click="disminuirCalificacion(est)"
+            :disabled="est.calificacion === 0"
+          >
+            -1
+          </button>
+
+          <button @click="eliminarEstudiante(est.id)">Eliminar</button>
+        </li>
+      </ul>
     </div>
 
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
