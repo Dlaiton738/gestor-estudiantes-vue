@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de estudiantes</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>Gestor de estudiantes</h1>
+        <p>Bienvenido al sistema de gestión de estudiantes.</p>
+
+        <label>nombre del estudiante:</label>
+        <input v-model="nombre" type="text" placeholder="nombre completo">
+        <br>
+        <button @click="comprobarFuncionamiento">
+            Probar Vue.js
+        </button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
