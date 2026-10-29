@@ -1,66 +1,185 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de estudiantes</title>
 
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-</head>
-<body>
+  </head>
+
+  <body>
     <div id="app">
-        <h1>Gestor de estudiantes</h1>
-        <p>Bienvenido al sistema de gestión de estudiantes.</p>
-        <form @submit.prevent="agregarEstudiante">
-            <fieldset>
-                <div>
-                    <label>nombre: </label>
-                    <input v-model.trim="Nombre" type="text" id="nombre" placeholder="nombre completo">
-                    <p v-if="errorNombre()">{{errorNombre()}}</p>
-                </div>
+      <h1>Gestor de estudiantes</h1>
+      <p>Bienvenido al sistema de gestión de estudiantes.</p>
 
-                <label for="carrera">Carrera:</label>
+      <form @submit.prevent="agregarEstudiante">
+        <fieldset>
+          <div>
+            <label for="nombre">Nombre:</label>
+            <input
+              v-model.trim="nombre"
+              type="text"
+              @blur="nombreTocado = true "
+              id="nombre"
+              placeholder="Nombre completo"
+            />
+            <p v-if="nombreTocado && errorNombre()"class="error">{{ errorNombre() }}</p>
+          </div>
 
-                <select id="carrera" v-model="carrera">
-                    <option value="">Selecciona una carrera</option>
+          <div>
+            <label for="carrera">Carrera:</label> 
+            <select id="carrera" v-model="carrera" @blur="carreraTocada = true ">
+              <option value="">Selecciona una carrera</option>
+              <option v-for="opcion in carreras" :key="opcion" :value="opcion">
+                {{ opcion }}
+              </option>
+            </select>
+            <p v-if="carreraTocada && errorCarrera()" class="error">
+                {{errorCarrera()}}
+            </p>
 
-                    <option v-for="opcion in carreras" :value="opcion">
-                        {{ opcion }}
-                    </option>
-                </select>
+            <p v-if="carrera">
+                quedan {{ lugaresDisponibles(carrera) }} lugares Para {{ carrera }} 
+            </p>
+          </div>
 
-                <div>
-                    <label>calificacion:</label>
-                    <input v-model.number="calificacion" type="number" id="calificacion" placeholder="calificacion">
-                </div>
+          <div>
+            <label for="calificacion">Calificación:</label>
+            <input
+              v-model.number="calificacion"
+              @blur="calificacionTocada = true"
+              type="number"
+              id="calificacion"
+              min="0"
+              max="10"
+              placeholder="Calificación"
+            />
 
+            <p v-if="calificacionTocada && errorCalificacion()" class="error">
+                {{errorCalificacion()}}
+            </p>
+          </div>
 
-                <div>
-                   
-                </div><br>
+          <br />
+          <button type="submit" :disabled="
+            errorNombre() ||
+            errorCarrera() ||
+            errorCalificacion() ||
+            esDuplicado() ||
+            estudiantes.length >= cupoMaximo
+            ">Registrar estudiante
+          </button>
+          
+          <p v-if="errorCupo" class="error">
+              Se alcanzó el cupo máximo de estudiantes.
+          </p>
 
-                <button type="submit">Registrar estudiante</button>
-            </fieldset>
-            
-        </form>
+          
+          <p v-if="errorDuplicado" class="error">
+              Ese estudiante ya existe
+          </p>
 
-        <h2>lista de estudiantes</h2>
-        
-        <ul>
-            <li v-for="estudiante in estudiantes">
-                {{estudiante}}
-            </li>
-        </ul>
-        <!-- <label>nombre escrito:{{nombre}}</label> -->
-        <!-- <br><br>
-        <button @click="comprobarFuncionamiento">
-            Probar Vue.js
-        </button> -->
+        </fieldset>
+      </form>
+
+      <h2>Lista de estudiantes</h2>
+
+      <div class="filtros">
+        <div>
+          <label for="filtroCarrera">Filtrar por carrera:</label>
+          <select id="filtroCarrera" v-model="filtroCarrera">
+            <option value="Todas">Todas</option>
+            <option
+              v-for="opcion in carreras"
+              :key="opcion"
+              :value="opcion"
+            >
+              {{ opcion }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="busqueda">Buscar por nombre:</label>
+          <input
+            id="busqueda"
+            v-model="busqueda"
+            type="text"
+            placeholder="Escribe un nombre..."
+          />
+        </div>
+
+        <div class="filtros-estado">
+          <button
+            type="button"
+            @click="filtroEstado = 'Todos'"
+            :class="{ activo: filtroEstado === 'Todos' }"
+          >
+            Todos
+          </button>
+
+          <button
+            type="button"
+            @click="filtroEstado = 'Aprobados'"
+            :class="{ activo: filtroEstado === 'Aprobados' }"
+          >
+            Aprobados
+          </button>
+
+          <button
+            type="button"
+            @click="filtroEstado = 'Reprobados'"
+            :class="{ activo: filtroEstado === 'Reprobados' }"
+          >
+            Reprobados
+          </button>
+        </div>
+      </div>
+
+      <p v-if="estudiantes.length === 0">
+        No hay estudiantes registrados.
+      </p>
+
+      <p v-else-if="estudiantesFiltrados().length === 0">
+        No hay estudiantes que coincidan con los filtros.
+      </p>
+
+      <ul>
+        <li v-for="est in estudiantesFiltrados()" :key="est.id">
+          <small>ID: {{ est.id }}</small> -
+           {{ est.nombre }} - {{ est.carrera }} -
+
+          <span v-if="est.calificacion === 10">⭐</span>
+
+          <span :class="colorNota(est.calificacion)">
+            {{ est.calificacion }}
+          </span>
+
+          <button
+            type="button"
+            @click="aumentarCalificacion(est)"
+            :disabled="est.calificacion === 10"
+          >
+            +1
+          </button>
+
+          <button
+            type="button"
+            @click="disminuirCalificacion(est)"
+            :disabled="est.calificacion === 0"
+          >
+            -1
+          </button>
+
+          <button type="button" @click="eliminarEstudiante(est.id)">
+            Eliminar
+          </button>
+        </li>
+      </ul>
     </div>
 
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
