@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
   <head>
@@ -18,55 +17,139 @@
       <form @submit.prevent="agregarEstudiante">
         <fieldset>
           <div>
-            <label>Nombre del estudiante:</label>
+            <label for="nombre">Nombre:</label>
             <input
-              v-model.trim="Nombre"
+              v-model.trim="nombre"
               type="text"
+              @blur="nombreTocado = true "
+              id="nombre"
               placeholder="Nombre completo"
             />
+            <p v-if="nombreTocado && errorNombre()"class="error">{{ errorNombre() }}</p>
           </div>
 
           <div>
-            <label>Edad:</label>
+            <label for="carrera">Carrera:</label> 
+            <select id="carrera" v-model="carrera" @blur="carreraTocada = true ">
+              <option value="">Selecciona una carrera</option>
+              <option v-for="opcion in carreras" :key="opcion" :value="opcion">
+                {{ opcion }}
+              </option>
+            </select>
+            <p v-if="carreraTocada && errorCarrera()" class="error">
+                {{errorCarrera()}}
+            </p>
+
+            <p v-if="carrera">
+                quedan {{ lugaresDisponibles(carrera) }} lugares Para {{ carrera }} 
+            </p>
+          </div>
+
+          <div>
+            <label for="calificacion">Calificación:</label>
             <input
-              v-model="Edad"
+              v-model.number="calificacion"
+              @blur="calificacionTocada = true"
               type="number"
-              placeholder="Edad del estudiante"
+              id="calificacion"
+              min="0"
+              max="10"
+              placeholder="Calificación"
             />
-          </div>
 
-          <div>
-            <label>Curso:</label>
-            <input
-              v-model="curso"
-              type="text"
-              placeholder="Curso del estudiante"
-            />
-          </div>
-
-          <div>
-            <label>Nota:</label>
-            <input
-              v-model.number="Nota"
-              type="number"
-              placeholder="Nota del estudiante"
-            />
+            <p v-if="calificacionTocada && errorCalificacion()" class="error">
+                {{errorCalificacion()}}
+            </p>
           </div>
 
           <br />
-          <button type="submit">Registrar estudiante</button>
+          <button type="submit" :disabled="
+            errorNombre() ||
+            errorCarrera() ||
+            errorCalificacion() ||
+            esDuplicado() ||
+            estudiantes.length >= cupoMaximo
+            ">Registrar estudiante
+          </button>
+          
+          <p v-if="errorCupo" class="error">
+              Se alcanzó el cupo máximo de estudiantes.
+          </p>
+
+          
+          <p v-if="errorDuplicado" class="error">
+              Ese estudiante ya existe
+          </p>
+
         </fieldset>
       </form>
 
       <h2>Lista de estudiantes</h2>
 
+      <div class="filtros">
+        <div>
+          <label for="filtroCarrera">Filtrar por carrera:</label>
+          <select id="filtroCarrera" v-model="filtroCarrera">
+            <option value="Todas">Todas</option>
+            <option
+              v-for="opcion in carreras"
+              :key="opcion"
+              :value="opcion"
+            >
+              {{ opcion }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="busqueda">Buscar por nombre:</label>
+          <input
+            id="busqueda"
+            v-model="busqueda"
+            type="text"
+            placeholder="Escribe un nombre..."
+          />
+        </div>
+
+        <div class="filtros-estado">
+          <button
+            type="button"
+            @click="filtroEstado = 'Todos'"
+            :class="{ activo: filtroEstado === 'Todos' }"
+          >
+            Todos
+          </button>
+
+          <button
+            type="button"
+            @click="filtroEstado = 'Aprobados'"
+            :class="{ activo: filtroEstado === 'Aprobados' }"
+          >
+            Aprobados
+          </button>
+
+          <button
+            type="button"
+            @click="filtroEstado = 'Reprobados'"
+            :class="{ activo: filtroEstado === 'Reprobados' }"
+          >
+            Reprobados
+          </button>
+        </div>
+      </div>
+
       <p v-if="estudiantes.length === 0">
         No hay estudiantes registrados.
       </p>
 
+      <p v-else-if="estudiantesFiltrados().length === 0">
+        No hay estudiantes que coincidan con los filtros.
+      </p>
+
       <ul>
         <li v-for="est in estudiantesFiltrados()" :key="est.id">
-          {{ est.nombre }} - {{ est.carrera }} -
+          <small>ID: {{ est.id }}</small> -
+           {{ est.nombre }} - {{ est.carrera }} -
 
           <span v-if="est.calificacion === 10">⭐</span>
 
@@ -75,6 +158,7 @@
           </span>
 
           <button
+            type="button"
             @click="aumentarCalificacion(est)"
             :disabled="est.calificacion === 10"
           >
@@ -82,13 +166,16 @@
           </button>
 
           <button
+            type="button"
             @click="disminuirCalificacion(est)"
             :disabled="est.calificacion === 0"
           >
             -1
           </button>
 
-          <button @click="eliminarEstudiante(est.id)">Eliminar</button>
+          <button type="button" @click="eliminarEstudiante(est.id)">
+            Eliminar
+          </button>
         </li>
       </ul>
     </div>

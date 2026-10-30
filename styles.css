@@ -9,3 +9,16 @@
 .rojo {
     color: red;
 }
+
+.filtros-estado .activo {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+}
+
+
+p.error {
+    color: red !important;
+    font-size: 18px;
+    font-weight: bold;
+}
