@@ -25,23 +25,30 @@
               id="nombre"
               placeholder="Nombre completo"
             />
-            <p v-if="nombreTocado && errorNombre()"class="error">{{ errorNombre() }}</p>
+            <p v-if="nombreTocado && errorNombre()" class="error">
+              {{ errorNombre() }}
+            </p>
           </div>
 
           <div>
-            <label for="carrera">Carrera:</label> 
-            <select id="carrera" v-model="carrera" @blur="carreraTocada = true ">
+            <label for="carrera">Carrera:</label>
+            <select
+              id="carrera"
+              v-model="carrera"
+              @blur="carreraTocada = true "
+            >
               <option value="">Selecciona una carrera</option>
               <option v-for="opcion in carreras" :key="opcion" :value="opcion">
                 {{ opcion }}
               </option>
             </select>
             <p v-if="carreraTocada && errorCarrera()" class="error">
-                {{errorCarrera()}}
+              {{errorCarrera()}}
             </p>
 
             <p v-if="carrera">
-                quedan {{ lugaresDisponibles(carrera) }} lugares Para {{ carrera }} 
+              quedan {{ lugaresDisponibles(carrera) }} lugares Para {{ carrera
+              }}
             </p>
           </div>
 
@@ -58,29 +65,29 @@
             />
 
             <p v-if="calificacionTocada && errorCalificacion()" class="error">
-                {{errorCalificacion()}}
+              {{errorCalificacion()}}
             </p>
           </div>
 
           <br />
-          <button type="submit" :disabled="
+          <button
+            type="submit"
+            :disabled="
             errorNombre() ||
             errorCarrera() ||
             errorCalificacion() ||
             esDuplicado() ||
             estudiantes.length >= cupoMaximo
-            ">Registrar estudiante
+            "
+          >
+            Registrar estudiante
           </button>
-          
+
           <p v-if="errorCupo" class="error">
-              Se alcanzó el cupo máximo de estudiantes.
+            Se alcanzó el cupo máximo de estudiantes.
           </p>
 
-          
-          <p v-if="errorDuplicado" class="error">
-              Ese estudiante ya existe
-          </p>
-
+          <p v-if="errorDuplicado" class="error">Ese estudiante ya existe</p>
         </fieldset>
       </form>
 
@@ -91,11 +98,7 @@
           <label for="filtroCarrera">Filtrar por carrera:</label>
           <select id="filtroCarrera" v-model="filtroCarrera">
             <option value="Todas">Todas</option>
-            <option
-              v-for="opcion in carreras"
-              :key="opcion"
-              :value="opcion"
-            >
+            <option v-for="opcion in carreras" :key="opcion" :value="opcion">
               {{ opcion }}
             </option>
           </select>
@@ -138,18 +141,16 @@
         </div>
       </div>
 
-      <p v-if="estudiantes.length === 0">
-        No hay estudiantes registrados.
-      </p>
+      <p v-if="estudiantes.length === 0">Aún no hay estudiantes</p>
 
       <p v-else-if="estudiantesFiltrados().length === 0">
-        No hay estudiantes que coincidan con los filtros.
+        No hay estudiantes con esos filtros
       </p>
 
-      <ul>
+      <ul v-else>
         <li v-for="est in estudiantesFiltrados()" :key="est.id">
-          <small>ID: {{ est.id }}</small> -
-           {{ est.nombre }} - {{ est.carrera }} -
+          <small>ID: {{ est.id }}</small> - {{ est.nombre }} - {{ est.carrera }}
+          -
 
           <span v-if="est.calificacion === 10">⭐</span>
 
@@ -178,6 +179,15 @@
           </button>
         </li>
       </ul>
+
+      <button
+        type="button"
+        v-show="estudiantes.length > 0"
+        :disabled="estudiantes.length === 0"
+        @click="borrarTodo()">
+        Borrar todo
+      </button>
+
     </div>
 
     <script src="app.js"></script>
