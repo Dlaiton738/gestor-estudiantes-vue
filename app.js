@@ -21,10 +21,9 @@ createApp({
             filtroCarrera: "Todas",
             busqueda: "",
             filtroEstado: "Todos",
-            formularioEnviado:false,
+            formularioEnviado: false,
             errorDuplicado: false,
             errorCupo: false,
-
         };
     },
 
@@ -55,39 +54,38 @@ createApp({
 
         errorCalificacion() {
             if (
-            this.calificacion === null ||
-            this.calificacion === "" ||
-            !Number.isFinite(this.calificacion)
-        ){
-            return "La calificación es obligatoria y debe ser numérica";
-        }
+                this.calificacion === null ||
+                this.calificacion === "" ||
+                !Number.isFinite(this.calificacion)
+            ) {
+                return "La calificación es obligatoria y debe ser numérica";
+            }
 
-    if (this.calificacion < 0 || this.calificacion > 10) {
-        return "La calificación debe estar entre 0 y 10";
-    }
+            if (this.calificacion < 0 || this.calificacion > 10) {
+                return "La calificación debe estar entre 0 y 10";
+            }
 
-    return "";
-},
+            return "";
+        },
 
         agregarEstudiante() {
-
             this.formularioEnviado = true;
             this.errorDuplicado = false;
             this.errorCupo = false;
-            
+
             if (
                 this.errorNombre() ||
                 this.errorCarrera() ||
                 this.errorCalificacion()
-            ){
+            ) {
                 return;
             }
-            
-            if(this.esDuplicado()){
+
+            if (this.esDuplicado()) {
                 this.errorDuplicado = true;
                 return;
             }
-            
+
             if (this.estudiantes.length >= this.cupoMaximo) {
                 this.errorCupo = true;
                 return;
@@ -95,7 +93,6 @@ createApp({
 
             this.errorCupo = false;
 
-            
             this.estudiantes.push({
                 id: this.siguienteId++,
                 nombre: this.nombre.trim(),
@@ -110,15 +107,16 @@ createApp({
             this.errorDuplicado = false;
             this.nombreTocado = false;
             this.carreraTocada = false;
-            this.calificacionTocada = false;    
+            this.calificacionTocada = false;
         },
 
-        esDuplicado(){
+        esDuplicado() {
             return this.estudiantes.some((estudiante) => {
-             return(
-               estudiante.nombre.trim().toLowerCase() === this.nombre.trim().toLowerCase() &&
-               estudiante.carrera === this.carrera
-                )
+                return (
+                    estudiante.nombre.trim().toLowerCase() ===
+                    this.nombre.trim().toLowerCase() &&
+                    estudiante.carrera === this.carrera
+                );
             });
         },
 
@@ -179,6 +177,10 @@ createApp({
             this.estudiantes = this.estudiantes.filter(
                 (est) => est.id !== id
             );
+        },
+
+        borrarTodo() {
+            this.estudiantes = [];
         }
     }
 }).mount("#app");
